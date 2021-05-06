@@ -140,8 +140,6 @@
    --mysql-bin.000001	1241			
    ```
 
-5. 到底
-
 ### **window:canal**
 
 1. 下载canal [canal.deployer-1.1.5.tar.gz](https://github.com/alibaba/canal/releases/download/canal-1.1.5/canal.deployer-1.1.5.tar.gz) 并解压安装
