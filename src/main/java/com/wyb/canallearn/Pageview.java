@@ -266,4 +266,37 @@ public class Pageview {
 
 
     }
+
+    // HyperLogLog:
+    // 供不精确的去重计数功能，比较适合用来做大规模数据的去重统计，例如统计 UV
+    private static void calcUVInRedisHyperLogLog(JavaDStream<LogData> rowData) {
+
+        rowData.foreachRDD(new VoidFunction<JavaRDD<LogData>>() {
+            @Override
+            public void call(JavaRDD<LogData> logDataJavaRDD) throws Exception {
+                logDataJavaRDD.foreachPartition(new VoidFunction<Iterator<LogData>>() {
+                    @Override
+                    public void call(Iterator<LogData> logDataIterator) throws Exception {
+                        Jedis jedis = JedisUtil.getJedis();
+
+                        while (logDataIterator.hasNext()) {
+                            LogData logData = logDataIterator.next();
+                            String user_id = logData.getUser_id();
+                            String date_key = logData.getC_time().substring(0,10);
+                            jedis.pfadd(date_key,user_id);
+                            // 测试保留20秒
+                            jedis.expire(date_key,20);
+                            // jedis.expireAt(date_key,1);
+
+                        }
+                        jedis.close();
+                    }
+                });
+
+            }
+        });
+
+
+
+    }
 }
